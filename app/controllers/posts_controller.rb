@@ -15,6 +15,24 @@ class PostsController < ApplicationController
         }
     end
 
+    def show
+        @post = Post.find(params[:id])
+
+        @post_props = {
+            url: ENV["URL"],
+            post: @post,
+            current_user: current_user
+        }
+    end
+
+    def update 
+        @post = Post.find(params[:id])
+        @post.title = params[:title]
+        @post.body = params[:body]
+        @post.save
+
+    end
+
     def create
         byebug
         @post = Post.new(post_params)
