@@ -1,24 +1,55 @@
 import React, { Component, Fragment } from 'react'
 
+import { Editor, EditorState, RichUtils, convertFromRaw, convertToRaw, createFromContent } from 'draft-js';
+
 const csrfToken = ReactOnRails.authenticityToken()
+
+const dummy = `{"blocks":[{"key":"74tgg","text":"One Fine day in the middle OF the night... Two dead men got up to fight.","type":"unstyled","depth":0,"inlineStyleRanges":[{"offset":27,"length":3,"style":"BOLD"},{"offset":34,"length":9,"style":"ITALIC"}],"entityRanges":[],"data":{}}],"entityMap":{}}`
+
+const rawContentFromDatabase = convertFromRaw(JSON.parse(dummy))
+// const rawContentFromDatabase = convertFromRaw(JSON.parse(props.post.body))
+
+
+
 
 export default class PostEdit extends Component {
 
 
-    state = {
-        savedTitle: this.props.post.title,
-        savedBody: this.props.post.body,
-        title: this.props.post.title,
-        body: this.props.post.body,
-        current_user: this.props.current_user
+    constructor(props) {
+        let db = convertFromRaw(JSON.parse(props.post.body))
+        console.log("hello", db)
+        // console.log("hello", db)
+        super(props)
+
+
+        this.state = { 
+            editorState: EditorState.createWithContent(db), 
+            title: props.post.title
+        }
+
+        
+        this.onChange = (editorState) => this.setState({ editorState });
+        this.handleKeyCommand = this.handleKeyCommand.bind(this);
+    }
+
+    handleKeyCommand(command, editorState) {
+        const newState = RichUtils.handleKeyCommand(editorState, command);
+        if (newState) {
+            this.onChange(newState);
+            return 'handled';
+        }
+        return 'not-handled';
     }
 
     patchPost = () => {
+        let rawBody = JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()))
+
+
         fetch(`${this.props.url}/posts/${this.props.post.id}`, {
             method: "PATCH",
             body: JSON.stringify({
                 title: this.state.title,
-                body: this.state.body
+                body: rawBody
             }),
             headers: {
                 "X-CSRF-Token": csrfToken,
@@ -40,12 +71,36 @@ export default class PostEdit extends Component {
         }
     }
 
+    _onBoldClick = () => {
+        this.onChange(RichUtils.toggleInlineStyle(this.state.editorState, 'BOLD'));
+    }
+
+    showRaw= () => {
+        console.log(JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent())))
+    }
+
 
     render() {
+        // console.log(JSON.stringify(this.state.editorState))
 
         return (
             <div>
-                {this.areChangesSaved()}
+                <button onClick={this._onBoldClick.bind(this)}>Bold</button>
+                <button onClick={this.showRaw}> show raw </button>
+                <button
+                    onClick={this.patchPost}
+                >save changes</button>
+                <input
+                    value={this.state.title}
+                    onChange={(e) => this.setState({ title: e.target.value })}
+                ></input>
+
+                <Editor 
+                    editorState={this.state.editorState} 
+                    onChange={this.onChange}
+                    handleKeyCommand={this.handleKeyCommand} />
+
+                {/* {this.areChangesSaved()}
                 <form>
                     <input
                         value={this.state.title}
@@ -59,7 +114,7 @@ export default class PostEdit extends Component {
                 </form>
                 <button
                     onClick={this.patchPost}
-                >save changes</button>
+                >save changes</button> */}
             </div>
         )
     }
