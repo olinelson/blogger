@@ -1,4 +1,5 @@
 import React from 'react'
+import { Header } from 'semantic-ui-react'
 
 
 export default function Posts(props) {
@@ -9,10 +10,11 @@ export default function Posts(props) {
 
   return (
     <div>
-      <h4>Posts</h4>
+      <h4 className="ui huge header">Posts</h4>
+      <Header as="h1">Posts</Header>
       {props.posts.map(p => 
-        <a href={`${props.url}/posts/${p.id}`}>
-        <div key={p.id}>
+        <a key={p.id} href={`${props.url}/posts/${p.id}`}>
+        <div >
           <h4>{p.title}</h4>
           <p>{p.author}</p>
         </div>
