@@ -24,7 +24,7 @@ export default class PostShow extends Component {
       editing: false,
       unsavedChanges: false
     };
-
+    this.onChange = editorState => this.setState({ editorState });
     this.handleKeyCommand = this.handleKeyCommand.bind(this);
   }
 
@@ -36,6 +36,50 @@ export default class PostShow extends Component {
     }
     return "not-handled";
   }
+
+  _onBoldClick = () => {
+    this.onChange(RichUtils.toggleInlineStyle(this.state.editorState, "BOLD"));
+  };
+
+  _onItalicClick = () => {
+    this.onChange(
+      RichUtils.toggleInlineStyle(this.state.editorState, "ITALIC")
+    );
+  };
+
+  _onUnderlineClick = () => {
+    this.onChange(
+      RichUtils.toggleInlineStyle(this.state.editorState, "UNDERLINE")
+    );
+  };
+
+  _onH1Click = () => {
+    this.onChange(
+      RichUtils.toggleInlineStyle(this.state.editorState, "heading1")
+    );
+  };
+
+  showRaw = () => {
+    console.log(
+      JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()))
+    );
+  };
+
+  onTitleChange = e => {
+    this.setState({
+      title: e.target.value,
+      unsavedChanges: true
+    });
+    this.patchPost();
+  };
+
+  onEditorChange = editorState => {
+    this.setState({
+      editorState,
+      unsavedChanges: true
+    });
+    this.patchPost();
+  };
 
   patchPost = debounce(e => {
     let rawBody = JSON.stringify(
@@ -61,32 +105,6 @@ export default class PostShow extends Component {
     );
   }, 2000);
 
-  _onBoldClick = () => {
-    this.onChange(RichUtils.toggleInlineStyle(this.state.editorState, "BOLD"));
-  };
-
-  showRaw = () => {
-    console.log(
-      JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent()))
-    );
-  };
-
-  onTitleChange = (e) => {
-    this.setState({ 
-      title: e.target.value,
-      unsavedChanges: true 
-    })
-     this.patchPost();
-  };
-
-  onEditorChange = editorState => {
-    this.setState({
-      editorState,
-      unsavedChanges: true
-    });
-    this.patchPost();
-  };
-
   showEditButton = () => {
     if (
       this.props.current_user &&
@@ -109,6 +127,13 @@ export default class PostShow extends Component {
             value={this.state.title}
             onChange={e => this.onTitleChange(e)}
           />
+          <div className="style-bar">
+            <button className="alert alert-info" onClick={this._onBoldClick.bind(this)}>Bold</button>
+            <button onClick={this._onItalicClick.bind(this)}>Italic</button>
+            <button onClick={this._onUnderlineClick.bind(this)}>Underline</button>
+            <button onClick={this._onH1Click.bind(this)}>H1</button>
+          </div>
+
           <Editor
             editorState={this.state.editorState}
             onChange={this.onEditorChange}
@@ -132,9 +157,6 @@ export default class PostShow extends Component {
     return (
       <div>
         {this.showEditButton()}
-
-        <button onClick={this._onBoldClick.bind(this)}>Bold</button>
-        {this.state.savedState === this.state.editorState}
 
         {this.showEditor()}
       </div>
