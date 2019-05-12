@@ -2,12 +2,15 @@ class PostsController < ApplicationController
     layout "react_layout"
 
     def index
+
         @posts = Post.all.select { |p| p.published === true}
 
         @posts_props = {
             url: ENV["URL"],
             posts: @posts,
-            users: User.all
+            users: User.all,
+            current_user: current_user
+           
         }
     end
 
