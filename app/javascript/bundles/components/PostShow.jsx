@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from "react";
+import { debounce } from "debounce";
 
 import {
   Editor,
@@ -11,25 +12,19 @@ import {
 
 const csrfToken = ReactOnRails.authenticityToken();
 
-const dummy = `{"blocks":[{"key":"74tgg","text":"One Fine day in the middle OF the night... Two dead men got up to fight.","type":"unstyled","depth":0,"inlineStyleRanges":[{"offset":27,"length":3,"style":"BOLD"},{"offset":34,"length":9,"style":"ITALIC"}],"entityRanges":[],"data":{}}],"entityMap":{}}`;
-
-const rawContentFromDatabase = convertFromRaw(JSON.parse(dummy));
-// const rawContentFromDatabase = convertFromRaw(JSON.parse(props.post.body))
-
 export default class PostShow extends Component {
   constructor(props) {
     let db = convertFromRaw(JSON.parse(props.post.body));
-    console.log("hello", db);
-    // console.log("hello", db)
+
     super(props);
 
     this.state = {
       editorState: EditorState.createWithContent(db),
       title: props.post.title,
-      editing: false
+      editing: false,
+      unsavedChanges: false
     };
 
-    this.onChange = editorState => this.setState({ editorState });
     this.handleKeyCommand = this.handleKeyCommand.bind(this);
   }
 
@@ -42,7 +37,7 @@ export default class PostShow extends Component {
     return "not-handled";
   }
 
-  patchPost = () => {
+  patchPost = debounce(e => {
     let rawBody = JSON.stringify(
       convertToRaw(this.state.editorState.getCurrentContent())
     );
@@ -61,22 +56,10 @@ export default class PostShow extends Component {
       }
     }).then(e =>
       this.setState({
-        savedBody: this.state.body,
-        savedTitle: this.state.title
+        unsavedChanges: false
       })
     );
-  };
-
-  areChangesSaved = () => {
-    if (
-      this.state.body !== this.state.savedBody ||
-      this.state.title !== this.state.savedTitle
-    ) {
-      return "unsaved changes";
-    } else {
-      return "changes saved";
-    }
-  };
+  }, 2000);
 
   _onBoldClick = () => {
     this.onChange(RichUtils.toggleInlineStyle(this.state.editorState, "BOLD"));
@@ -88,6 +71,22 @@ export default class PostShow extends Component {
     );
   };
 
+  onTitleChange = (e) => {
+    this.setState({ 
+      title: e.target.value,
+      unsavedChanges: true 
+    })
+     this.patchPost();
+  };
+
+  onEditorChange = editorState => {
+    this.setState({
+      editorState,
+      unsavedChanges: true
+    });
+    this.patchPost();
+  };
+
   showEditButton = () => {
     if (
       this.props.current_user &&
@@ -95,7 +94,8 @@ export default class PostShow extends Component {
     ) {
       return (
         <button onClick={() => this.setState({ editing: !this.state.editing })}>
-        {this.state.editing ? "done" : "edit"}</button>
+          {this.state.editing ? "done" : "edit"}
+        </button>
       );
     }
   };
@@ -104,13 +104,14 @@ export default class PostShow extends Component {
     if (this.state.editing === true) {
       return (
         <Fragment>
+          {this.state.unsavedChanges === true ? "unsaved changes" : "saved"}
           <input
             value={this.state.title}
-            onChange={e => this.setState({ title: e.target.value })}
+            onChange={e => this.onTitleChange(e)}
           />
           <Editor
             editorState={this.state.editorState}
-            onChange={this.onChange}
+            onChange={this.onEditorChange}
             handleKeyCommand={this.handleKeyCommand}
           />
         </Fragment>
@@ -133,26 +134,9 @@ export default class PostShow extends Component {
         {this.showEditButton()}
 
         <button onClick={this._onBoldClick.bind(this)}>Bold</button>
-        <button onClick={this.showRaw}> show raw </button>
-        <button onClick={this.patchPost}>save changes</button>
+        {this.state.savedState === this.state.editorState}
 
         {this.showEditor()}
-
-        {/* {this.areChangesSaved()}
-                <form>
-                    <input
-                        value={this.state.title}
-                        onChange={(e) => this.setState({ title: e.target.value })}
-                    ></input>
-                    <input
-                        value={this.state.body}
-                        onChange={(e) => this.setState({ body: e.target.value })}
-
-                    ></input>
-                </form>
-                <button
-                    onClick={this.patchPost}
-                >save changes</button> */}
       </div>
     );
   }
