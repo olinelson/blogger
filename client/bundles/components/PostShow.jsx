@@ -22,8 +22,9 @@ export default class PostShow extends Component {
     this.state = {
       editorState: EditorState.createWithContent(db),
       title: props.post.title,
-      editing: true,
-      unsavedChanges: false
+      editing: false,
+      unsavedChanges: false,
+      published: props.post.published
     };
     this.onChange = editorState => this.setState({ editorState });
     this.handleKeyCommand = this.handleKeyCommand.bind(this);
@@ -119,10 +120,29 @@ export default class PostShow extends Component {
     }
   };
 
+  publishPost = (boolean) => {
+    fetch(`${this.props.url}/posts/publish`, {
+      method: "POST",
+      body: JSON.stringify({
+        id: this.props.post.id,
+      }),
+      headers: {
+        "X-CSRF-Token": csrfToken,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    }).then( this.setState({published: !this.state.published}))
+  }
+
   showEditor = () => {
     if (this.state.editing === true) {
       return (
         <Fragment>
+          <button onClick={(e) => this.publishPost()}>
+          {this.state.published === true ? "unpublish" : "publish"}
+          </button>
+         
           {this.state.unsavedChanges === true ? "unsaved changes" : "saved"}
           <input
             value={this.state.title}

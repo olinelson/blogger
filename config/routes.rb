@@ -1,9 +1,11 @@
 Rails.application.routes.draw do
   
 
-  
+
 
   get "posts/create", to: "posts#create_post"
+
+  post "posts/publish", to: "posts#publish"
 
   resources :posts 
   

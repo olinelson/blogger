@@ -2,9 +2,11 @@ class PostsController < ApplicationController
     layout "react_layout"
 
     def index
+        @posts = Post.all.select { |p| p.published === true}
+
         @posts_props = {
             url: ENV["URL"],
-            posts: Post.all,
+            posts: @posts,
             users: User.all
         }
     end
@@ -39,11 +41,18 @@ class PostsController < ApplicationController
         @post.body = '{"blocks":[{"key":"f49gb","text":"Your post body goes here...","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}'
         @post.user_id = current_user.id
         @post.author = current_user.username
+        @post.published = false
         @post.save
 
         redirect_to action: "show", id: @post.id 
 
 
+    end
+
+    def publish
+        @post = Post.find(params[:id])
+        @post.published = !@post.published
+        @post.save
     end
 
     def post_params
