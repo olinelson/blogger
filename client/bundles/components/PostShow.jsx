@@ -13,6 +13,7 @@ import {
 const csrfToken = ReactOnRails.authenticityToken();
 
 export default class PostShow extends Component {
+
   constructor(props) {
     let db = convertFromRaw(JSON.parse(props.post.body));
 
@@ -21,7 +22,7 @@ export default class PostShow extends Component {
     this.state = {
       editorState: EditorState.createWithContent(db),
       title: props.post.title,
-      editing: false,
+      editing: true,
       unsavedChanges: false
     };
     this.onChange = editorState => this.setState({ editorState });
@@ -135,6 +136,7 @@ export default class PostShow extends Component {
           </div>
 
           <Editor
+            className="ui text container"
             editorState={this.state.editorState}
             onChange={this.onEditorChange}
             handleKeyCommand={this.handleKeyCommand}

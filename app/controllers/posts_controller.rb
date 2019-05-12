@@ -33,12 +33,17 @@ class PostsController < ApplicationController
 
     end
 
-    def create
-        byebug
+    def create_post
         @post = Post.new(post_params)
+        @post.title = "Your New Post"
+        @post.body = '{"blocks":[{"key":"f49gb","text":"Your post body goes here...","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}'
         @post.user_id = current_user.id
         @post.author = current_user.username
         @post.save
+
+        redirect_to action: "show", id: @post.id 
+
+
     end
 
     def post_params
