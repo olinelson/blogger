@@ -3,6 +3,7 @@ import ReactOnRails from "react-on-rails";
 import Posts from "../bundles/components/Posts";
 import PostShow from "../bundles/components/PostShow";
 import UserShow from "../bundles/components/UserShow";
+import NavBar from "../bundles/components/NavBar";
 
 import "semantic-ui-css/semantic.min.css";
 
@@ -10,5 +11,6 @@ import "semantic-ui-css/semantic.min.css";
 ReactOnRails.register({
   Posts,
   PostShow,
-  UserShow
+  UserShow,
+  NavBar
 });

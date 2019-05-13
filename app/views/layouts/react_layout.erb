@@ -8,11 +8,23 @@
 
   <body>
 
- 
 
-    
-    <%= react_component("NavBar") %>
+  <% if signed_in? %>
+   <%= react_component("NavBar", props: {
+     signed_in: true,
+     current_user: current_user,
+     sign_out_path: sign_out_path,
+     url: ENV["URL"],
+   }, prerender: false) %>
 
+
+<% else %>
+   <%= react_component("NavBar", props: {
+     signed_in: false,
+     sign_in_path: sign_in_path,
+     url: ENV["URL"],
+   }, prerender: false) %>
+<% end %>
     <%= yield %>
   </body>
 </html>
