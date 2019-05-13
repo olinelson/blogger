@@ -8,6 +8,8 @@ Rails.application.routes.draw do
   post "posts/publish", to: "posts#publish"
 
   resources :posts
+
+  match "test", to: "posts#index", via: :all
   
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
