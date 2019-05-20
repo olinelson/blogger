@@ -1,6 +1,9 @@
 import React, { Component, Fragment } from "react";
 import { debounce } from "debounce";
 
+// react dropzone
+import Dropzone from 'react-dropzone'
+
 import {
   Editor,
   EditorState,
@@ -135,8 +138,27 @@ export default class PostShow extends Component {
     }).then( this.setState({published: !this.state.published}))
   }
 
+  onDropAction = (acceptedFiles) => {
+    console.log(acceptedFiles[0])
+    let formData = new FormData();
+    formData.append("file", acceptedFiles[0]);
+    formData.append("post_id", this.props.post.id,);
+
+
+    fetch(`${this.props.url}/posts/add_image`, {
+      method: "POST",
+      body: formData,
+
+      headers: {
+        "X-CSRF-Token": csrfToken,
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    })
+  }
+
   showEditor = () => {
-    if (this.state.editing === true) {
+
       return (
         <Fragment>
           <button onClick={(e) => this.publishPost()}>
@@ -161,26 +183,37 @@ export default class PostShow extends Component {
             onChange={this.onEditorChange}
             handleKeyCommand={this.handleKeyCommand}
           />
+          <Dropzone onDrop={acceptedFiles => (this.onDropAction(acceptedFiles))}>
+            {({ getRootProps, getInputProps }) => (
+              <section>
+                <div {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  <p>Drag 'n' drop some files here, or click to select files</p>
+                </div>
+              </section>
+            )}
+          </Dropzone>
         </Fragment>
       );
-    } else {
-      return (
-        <Fragment>
-          <h4>{this.state.title}</h4>
-          <Editor editorState={this.state.editorState} />
-        </Fragment>
-      );
-    }
+    
   };
 
   render() {
-    // console.log(this.props.current_user.id === this.props.post.id);
+
 
     return (
       <div>
         {this.showEditButton()}
 
-        {this.showEditor()}
+        {this.state.editing === true ? this.showEditor() : 
+          <Fragment>
+            <h4>{this.state.title}</h4>
+            <Editor editorState={this.state.editorState} />
+          </Fragment>
+        }
+
+        {/* <img src={}/> */}
+
       </div>
     );
   }

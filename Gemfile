@@ -72,3 +72,5 @@ gem 'mini_racer', platforms: :ruby
 
 gem 'clearance'
 
+gem "google-cloud-storage"
+

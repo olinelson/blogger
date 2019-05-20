@@ -8,6 +8,8 @@ Rails.application.routes.draw do
 
   post "posts/publish", to: "posts#publish"
 
+  post "posts/add_image", to: "posts#add_image"
+
   resources :posts
 
   match "test", to: "posts#index", via: :all

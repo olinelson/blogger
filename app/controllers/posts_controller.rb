@@ -1,6 +1,8 @@
 class PostsController < ApplicationController
     layout "react_layout"
 
+    
+
     before_action :require_login, only: :create
 
     def index
@@ -25,10 +27,13 @@ class PostsController < ApplicationController
     def show
         @post = Post.find(params[:id])
 
+        @image_key = @post.images.first.key
+
         @post_props = {
             url: ENV["URL"],
             post: @post,
-            current_user: current_user
+            current_user: current_user,
+            image_key: @image_key
         }
     end
 
@@ -58,6 +63,14 @@ class PostsController < ApplicationController
         @post = Post.find(params[:id])
         @post.published = !@post.published
         @post.save
+    end
+
+    def add_image
+        byebug
+        @post = Post.find(params[:post_id])
+        file = params[:file]
+        @post.images.attach(file)
+
     end
 
     def post_params
