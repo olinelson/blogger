@@ -1,6 +1,8 @@
 class PostsController < ApplicationController
     layout "react_layout"
 
+    before_action :require_login, only: :create
+
     def index
 
         @posts = Post.all.select { |p| p.published === true}
@@ -38,7 +40,7 @@ class PostsController < ApplicationController
 
     end
 
-    def create_post
+    def create
         @post = Post.new(post_params)
         @post.title = "Your New Post"
         @post.body = '{"blocks":[{"key":"f49gb","text":"Your post body goes here...","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}'

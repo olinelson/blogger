@@ -10,7 +10,8 @@ const csrfToken = ReactOnRails.authenticityToken();
 export default class NavBar extends Component {
 
     state = {
-        signed_in: this.props.signed_in
+        signed_in: this.props.signed_in,
+        activeItem: "home"
     }
 
     handleItemClick = (e, { name }) => this.setState({ activeItem: name })
@@ -27,20 +28,25 @@ export default class NavBar extends Component {
         }).then(() => window.location.reload())
     }
 
+   
+
     render() {
-        const { activeItem } = this.state
+        console.log("hello!!!!!!!!!", this.state)
+
+
 
         return (
             <Menu secondary>
-            <Menu.Item name='home' active={activeItem === 'home'} onClick={this.handleItemClick} />
+            <Menu.Item 
+                href={this.props.url}
+                name='home' 
+
+                onClick={this.handleItemClick} 
+                />
             <Menu.Item
-                name='posts'
-                active={activeItem === 'posts'}
-                onClick={this.handleItemClick}
-            />
-            <Menu.Item
-                name='users'
-                active={activeItem === 'users'}
+                href={`${this.props.url}/posts/create`}
+                name='new post'
+
                 onClick={this.handleItemClick}
             />
             <Menu.Menu position='right'>
@@ -48,16 +54,24 @@ export default class NavBar extends Component {
                     <Input icon='search' placeholder='Search...' />
                 </Menu.Item>
                 {this.props.signed_in === true ?
-                    <Menu.Item
-                        name='sign out'
-                        active={activeItem === 'sign out'}
-                        onClick={this.handleSignOut}
-                    />
+                    <Fragment>
+                        <Menu.Item
+                            name='my account'
+
+                            href={`${this.props.url}/users/${this.props.current_user.id}`}
+                        />
+                        <Menu.Item
+                            name='sign out'
+
+                            onClick={this.handleSignOut}
+                        />
+                        
+                    </Fragment>
                     :
                     <Menu.Item
                         href="/sign_in"
                         name='sign in'
-                        active={activeItem === 'sign in'}
+
 
                     />
             }

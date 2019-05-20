@@ -6,7 +6,7 @@ export default function UserShow(props) {
     if (props.current_user && props.current_user.id === props.user.id){
       return (
         <div>
-          <h4>Unpublished Posts</h4>
+          <h4>Drafts</h4>
           {mapPosts(props.unpublished_posts)}
         </div>
       )
@@ -35,7 +35,7 @@ export default function UserShow(props) {
     <div>
       <h1>{props.user.email}</h1>
 
-      <h4>Posts</h4>
+      <h4>Published Posts</h4>
 
       {mapPosts(props.published_posts)}
 
