@@ -12,11 +12,14 @@ import debounce from "debounce"
 
 const csrfToken = ReactOnRails.authenticityToken();
 
+
+
 export default class PostShow extends Component {
 
 
   state = {
-    body: this.props.post.body
+    body: this.props.post.body,
+    editing: false
   }
 
   handleChange = (body) => {
@@ -24,23 +27,8 @@ export default class PostShow extends Component {
     this.patchPost()
   }
 
-  
-
-  // onTitleChange = e => {
-  //   this.setState({
-  //     title: e.target.value,
-  //     unsavedChanges: true
-  //   });
-  //   this.patchPost();
-  // };
-
- 
-
-  
-
   patchPost = debounce(e => {
     
-
     fetch(`${this.props.url}/posts/${this.props.post.id}`, {
       method: "PATCH",
       body: JSON.stringify({
@@ -67,7 +55,8 @@ export default class PostShow extends Component {
     ) {
       return (
         <button onClick={() => this.setState({ editing: !this.state.editing })}>
-          {this.state.editing ? "done" : "edit"}
+          {/* {this.state.disableEditing ? "done" : "edit"} */}
+          edit
         </button>
       );
     }
@@ -88,22 +77,39 @@ export default class PostShow extends Component {
     }).then( this.setState({published: !this.state.published}))
   }
 
+  createMarkup = () => {
+  return { __html: this.state.body };
+}
 
 
   render() {
-    console.log(this.props)
+    console.log(this.state.editing)
+
+    
+   
     return (
       <div className="app">
         {this.showEditButton()}
 
 
+        {this.state.editing === true ? 
+          <Editor
+            text={this.state.body}
+            onChange={this.handleChange}
+          />
 
-        <Editor
-          text={this.state.body} 
-          tag="pre"
-          onChange={this.handleChange}
-          editingDisabled
-           />
+          :
+          <div className="medium-editor-element" dangerouslySetInnerHTML={this.createMarkup()} />}
+
+
+        
+
+
+
+
+        
+   
+          
       </div>
     )
   }
