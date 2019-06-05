@@ -13,3 +13,7 @@
  *= require_tree .
  *= require_self
  */
+/* .medium-editor-element{
+    border: 1px solid red !important;
+} */
+
