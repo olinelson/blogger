@@ -27,13 +27,10 @@ class PostsController < ApplicationController
     def show
         @post = Post.find(params[:id])
 
-        @image_key = @post.images.first.key
-
         @post_props = {
             url: ENV["URL"],
             post: @post,
             current_user: current_user,
-            image_key: @image_key
         }
     end
 
@@ -45,10 +42,10 @@ class PostsController < ApplicationController
 
     end
 
-    def create
+    def new
+
         @post = Post.new(post_params)
         @post.title = "Your New Post"
-        @post.body = '{"blocks":[{"key":"f49gb","text":"Your post body goes here...","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{}}'
         @post.user_id = current_user.id
         @post.author = current_user.username
         @post.published = false
@@ -60,9 +57,19 @@ class PostsController < ApplicationController
     end
 
     def publish
+
         @post = Post.find(params[:id])
         @post.published = !@post.published
         @post.save
+    end
+
+    def destroy
+    
+        @post = Post.find(params[:id])
+        user_id = @post.user_id
+        @post.delete
+        # redirect_to :controller => 'users', :action => 'show', id: user_id
+        redirect_to action: "index"
     end
 
     def add_image
@@ -76,4 +83,6 @@ class PostsController < ApplicationController
     def post_params
         params.permit(:title, :body, :user_id)
     end
+
+
 end

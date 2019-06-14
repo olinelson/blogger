@@ -44,7 +44,7 @@ export default class NavBar extends Component {
                 onClick={this.handleItemClick} 
                 />
             <Menu.Item
-                href={`${this.props.url}/posts/create`}
+                href={`${this.props.url}/posts/new`}
                 name='new post'
 
                 onClick={this.handleItemClick}

@@ -68,7 +68,19 @@ export default class PostShow extends Component {
     }
   };
 
-  publishPost = boolean => {
+  deletePost = () => {
+    fetch(`${this.props.url}/posts/${this.props.post.id}`, {
+      method: "DELETE",
+      headers: {
+        "X-CSRF-Token": csrfToken,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    })
+  };
+
+  publishPost = () => {
     fetch(`${this.props.url}/posts/publish`, {
       method: "POST",
       body: JSON.stringify({
@@ -134,10 +146,27 @@ export default class PostShow extends Component {
 
   dropDownOptions = () => {
     return [
-      { key: "edit", icon: "edit", text: "Edit Post", value: "edit" },
-      { key: "delete", icon: "delete", text: "Remove Post", value: "delete" },
-      { key: "hide", icon: "hide", text: "Hide Post", value: "hide" }
+      { key: "publish", icon: "send", text: "Publish Post", value: "publish" },
+      { key: "delete", icon: "remove", text: "Delete Post", value: "delete" }
     ];
+  };
+
+  dropDownHandler = input => {
+    input = input.target.innerText;
+
+    console.log(input);
+
+    switch (input) {
+      case "Publish Post":
+        this.publishPost();
+        break;
+      case "Delete Post":
+        this.deletePost();
+        break;
+      case "hide":
+        console.log("hide");
+        break;
+    }
   };
 
   render() {
@@ -146,12 +175,17 @@ export default class PostShow extends Component {
         <Menu secondary>
           <Menu.Item position="right">
             <Button.Group color="teal">
-              <Button>Save</Button>
+              <Button
+                onClick={() => this.setState({ editing: !this.state.editing })}
+              >
+                {this.state.editing === true ? "Done" : "Edit"}
+              </Button>
               <Dropdown
                 className="button icon"
                 floating
                 options={this.dropDownOptions()}
                 trigger={<React.Fragment />}
+                onChange={this.dropDownHandler}
               />
             </Button.Group>
           </Menu.Item>
