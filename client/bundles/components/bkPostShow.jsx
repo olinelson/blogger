@@ -22,22 +22,9 @@ import editorStyles from "./editorStyles"
      }
 
     render() {
-        console.log(this.state)
+
         return (
             <div className="app">
-                <h1>react-medium-editor</h1>
-                <h3>Html content</h3>
-                <div>{this.state.text}</div>
-
-                <h3>Editor #1 (&lt;pre&gt; tag)</h3>
-                <Editor
-                    tag="pre"
-                    text={this.state.text}
-                    onChange={this.handleChange}
-                    options={{ toolbar: { buttons: ['bold', 'italic', 'underline'] } }}
-                    
-                />
-                <h3>Editor #2</h3>
                 <Editor
                 text={this.state.text} onChange={this.handleChange} />
             </div>

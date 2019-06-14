@@ -31,7 +31,7 @@ export default class NavBar extends Component {
    
 
     render() {
-        console.log("hello!!!!!!!!!", this.state)
+
 
 
 
